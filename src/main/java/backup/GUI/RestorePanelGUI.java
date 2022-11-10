@@ -1,5 +1,8 @@
 package backup.GUI;
 
+import backup.Tools.SavedFile;
+import com.sun.source.tree.NewArrayTree;
+
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -9,35 +12,30 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
+import static backup.BackupApp.*;
+import static backup.GUI.BackupPanelGUI.fixedSizeLabel;
 
-import backup.Tools.MultipartFileUploadTest;
-import backup.Tools.SavedFile;
 
-import static backup.BackupApp.fileSavedlist;
-import static backup.BackupApp.tabbedPane;
-import static backup.GUI.RestorePanelGUI.restorePanel;
-
-public class BackupPanelGUI {
-    private static JTree backupTree;
-    private static JLabel backupSourceLabel;
-    private static JLabel backTargetLabel;
-    private static JButton backupSourceButton;
-    private static JButton backupTargetButton;
-    private static JButton backupStartButton;
-    public static JPanel backupPanel ;
-    private static final String BACKUP_SOURCE_PLACEHOLDER = "选择源备份目录";
-    private static final String BACKUP_TARGET_PLACEHOLDER = "选择目标存放目录";
+public class RestorePanelGUI {
+    private static JTree restoreTree;
+    private static JButton restoreSourceButton;
+    private static JButton restoreTargetButton;
+    private static JButton restoreStartButton;
+    private static JLabel restoreSourceLabel;
+    private static JLabel restoreTargetLabel;
+    public static JPanel restorePanel ;
 
     public static String sourcePath="";
     public static String targetPath="";
 
-    public static void updateBackupTree(){
+
+    public static void updateRestoreTree(){
 
         GridBagConstraints c=new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
         c.insets = new Insets(5, 5, 5, 5);
 
-        backupPanel.remove(backupTree);
+        restorePanel.remove(restoreTree);
         DefaultMutableTreeNode root=new DefaultMutableTreeNode("已备份文件");
         DefaultMutableTreeNode node=null;
         for(int i = 0; i< fileSavedlist.size(); i++)
@@ -51,70 +49,58 @@ public class BackupPanelGUI {
 
             root.add(node);
         }
-        backupTree=new JTree(root);
-        backupTree.addTreeSelectionListener(new TreeSelectionListener() {
+        restoreTree=new JTree(root);
+        restoreTree.addTreeSelectionListener(new TreeSelectionListener() {
             @Override
             public void valueChanged(TreeSelectionEvent e) {
-                DefaultMutableTreeNode node = (DefaultMutableTreeNode) backupTree.getLastSelectedPathComponent();
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode) restoreTree.getLastSelectedPathComponent();
                 if (node == null) {
                     return;
                 }
                 String filepath= node.getUserObject().toString();
                 System.out.println("点击"+filepath);
-                int n=JOptionPane.showConfirmDialog(null,"确认是否上传到云盘","提示", JOptionPane.YES_NO_OPTION );
+                sourcePath=new String(filepath);
+                int n=JOptionPane.showConfirmDialog(null,"确认是否添加到待恢复文件","提示", JOptionPane.YES_NO_OPTION );
                 System.out.println("joption:"+n);
                 if(n==0){
                     //点击是
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-
-                            MultipartFileUploadTest.send(filepath);
-                        }
-                    }).start();
-
+                    restoreSourceLabel.setText("待恢复文件"+filepath);
                 }
+
 
             }
         });
         // backupPanel.add(tree);
         c.gridx=0;
-        c.gridy=4;
+        c.gridy=0;
         c.gridwidth=1;
 
         System.out.println("tree add");
-        backupPanel.add(backupTree,c);
+        restorePanel.add(restoreTree,c);
 
     }
-    public static JLabel fixedSizeLabel(String text) {
-        JLabel label = new JLabel(text);
-        Dimension dimension = new Dimension(320, 32);
-        label.setMinimumSize(dimension);
-        label.setMaximumSize(dimension);
-        label.setPreferredSize(dimension);
-        return label;
-    }
     public static void init(){
-        backupPanel = new JPanel();
-        backupPanel.setLayout(new GridBagLayout());
-        GridBagConstraints c=new GridBagConstraints();
+
+        restorePanel.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
         c.insets = new Insets(5, 5, 5, 5);
 
-        backupSourceLabel = fixedSizeLabel(BACKUP_SOURCE_PLACEHOLDER);
+        restoreSourceLabel = fixedSizeLabel("待恢复文件");
         c.gridx = 0;
-        c.gridy = 0;
-        c.gridwidth = 3;
-        backupPanel.add(backupSourceLabel, c);
-     //   backupSourceLabel.setFont(new Font("微软雅黑", Font.BOLD, 23));
-        backupSourceButton = new JButton("Choose source dir");
-        backupSourceButton.addActionListener(new ActionListener() {
+        c.gridy = 1;
+        c.gridwidth = 1;
+        restorePanel.add(restoreSourceLabel, c);
+
+
+        restoreSourceButton = new JButton("选择待恢复文件");
+        restoreSourceButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JFileChooser fc = new JFileChooser();
-                // 选择备份源文件、备份目标文件和恢复目标文件时，只允许选择目录
-                fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                fc.setCurrentDirectory(new File("C:\\Users\\Charon\\Desktop"));
+                // 选择恢复源文件时，只允许选择普通文件
+                fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            //    fc.setCurrentDirectory(new File("C:\\Users\\Charon\\Desktop"));
                 int result = fc.showOpenDialog(null);
                 if (result != JFileChooser.APPROVE_OPTION) {
                     return;
@@ -125,27 +111,29 @@ public class BackupPanelGUI {
                 String path = file.getAbsolutePath();
                 sourcePath=new String(path);
 
+                restoreSourceLabel.setText("待恢复文件"+path);
+
             }
         });
         c.gridx = 3;
-        c.gridy = 0;
-        c.gridwidth = 1;
-        backupPanel.add(backupSourceButton, c);
-
-        backTargetLabel = fixedSizeLabel(BACKUP_TARGET_PLACEHOLDER);
-        c.gridx = 0;
         c.gridy = 1;
-        c.gridwidth = 3;
-        backupPanel.add(backTargetLabel, c);
+        c.gridwidth = 1;
+        restorePanel.add(restoreSourceButton, c);
 
-        backupTargetButton = new JButton("Choose target dir");
-        backupTargetButton.addActionListener(new ActionListener() {
+        restoreTargetLabel = fixedSizeLabel("恢复目录");
+        c.gridx = 0;
+        c.gridy = 2;
+        c.gridwidth = 3;
+        restorePanel.add(restoreTargetLabel, c);
+
+        restoreTargetButton = new JButton("选择恢复文件存放目录");
+        restoreTargetButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JFileChooser fc = new JFileChooser();
                 // 选择备份源文件、备份目标文件和恢复目标文件时，只允许选择目录
                 fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                fc.setCurrentDirectory(new File("C:\\Users\\Charon\\Desktop"));
+                //fc.setCurrentDirectory(new File("~"));
                 int result = fc.showOpenDialog(null);
                 if (result != JFileChooser.APPROVE_OPTION) {
                     return;
@@ -154,30 +142,35 @@ public class BackupPanelGUI {
                 // 获取选择的文件路径并设置相应 label 的值
                 File file = fc.getSelectedFile();
                 String path = file.getAbsolutePath();
-                targetPath=new String(path);
 
+
+                targetPath=new String(path);
+                restoreTargetLabel.setText("恢复文件存放目录"+path);
             }
         });
         c.gridx = 3;
-        c.gridy = 1;
+        c.gridy = 2;
         c.gridwidth = 1;
-        backupPanel.add(backupTargetButton, c);
+        restorePanel.add(restoreTargetButton, c);
 
-        backupStartButton = new JButton("开始备份");
-        backupStartButton.addActionListener(new ActionListener() {
+
+
+        restoreStartButton = new JButton("开始恢复");
+        restoreStartButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if ("".equals(sourcePath)) {
-                    error("You need to select the directory to backup first");
+                    error("请选择待恢复文件");
                     return;
                 }
                 if ("".equals(targetPath)) {
-                    error("You need to select the directory to place the backup file first");
+                    error("请先选择恢复文件存放目录");
                     return;
                 }
 
                 try {
-                    new DemoDialog(sourcePath,targetPath);
+                    new RestoreDialog(sourcePath, targetPath);
+                    //   String password = new String(restorePassword.getPassword()).trim();
 
 
                 } catch (Exception exception) {
@@ -187,18 +180,18 @@ public class BackupPanelGUI {
             }
         });
         c.gridx = 3;
-        c.gridy = 2;
+        c.gridy = 3;
         c.gridwidth = 1;
-        backupPanel.add(backupStartButton, c);
-        backupTree=new JTree();
-        backupPanel.add(backupTree);
 
-        updateBackupTree();
-        tabbedPane.add("备份", backupPanel);
+        restorePanel.add(restoreStartButton, c);
+        restoreTree=new JTree();
+        restorePanel.add(restoreTree);
+
+        updateRestoreTree();
+        tabbedPane.add("恢复", restorePanel);
 
     }
     private static void error(String msg) {
         JOptionPane.showMessageDialog(null, msg, "Error", JOptionPane.ERROR_MESSAGE);
     }
-
 }

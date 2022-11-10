@@ -1,5 +1,7 @@
 package backup;
 
+import backup.Tools.SystemDiff;
+
 import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.*;
@@ -52,27 +54,32 @@ public class Packer {
     // soft link:    creationTime|lastAccessTime|lastModifiedTime|owner|group|permissions|type|target
     // directory:    creationTime|lastAccessTime|lastModifiedTime|owner|group|permissions|type|(name|inode)*|(long)0
     private void pack(Path path, DataOutputStream out, Map<String, Path> fileKeyToPath, FileFilter fileFilter) throws IOException {
-       // String fileKey = getFileKey(path);
-//        if (fileKeyToPath.containsKey(fileKey)) {
-//            // 如果当前文件和目录中已经打包好的某个文件 inode 相同
-//            // 那么就不再重复打包 inode 及其指向的数据了
-//            System.out.println(path + " is a hard link to " + fileKeyToPath.get(fileKey) + ", file key: " + fileKey);
-//            return;
-//        } else {
-//            fileKeyToPath.put(fileKey, path);
-//        }
+        if(SystemDiff.isLinux()) {
+            String fileKey = getFileKey(path);
+            if (fileKeyToPath.containsKey(fileKey)) {
+                // 如果当前文件和目录中已经打包好的某个文件 inode 相同
+                // 那么就不再重复打包 inode 及其指向的数据了
+                System.out.println(path + " is a hard link to " + fileKeyToPath.get(fileKey) + ", file key: " + fileKey);
+                return;
+            } else {
+                fileKeyToPath.put(fileKey, path);
+            }
+        }
 
         BasicFileAttributes attr = Files.readAttributes(path,BasicFileAttributes.class);
-        //PosixFileAttributes attr = Files.readAttributes(path, PosixFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
+        //
         FileTime creationTime = attr.creationTime();
         FileTime lastAccessTime = attr.lastAccessTime();
         FileTime lastModifiedTime = attr.lastModifiedTime();
         out.writeLong(creationTime.to(TimeUnit.NANOSECONDS));
         out.writeLong(lastAccessTime.to(TimeUnit.NANOSECONDS));
         out.writeLong(lastModifiedTime.to(TimeUnit.NANOSECONDS));
-       // writeString(attr.owner().getName(), out);
-       // writeString(attr.group().getName(), out);
-      //  writeString(PosixFilePermissions.toString(attr.permissions()), out);
+        if(SystemDiff.isLinux()) {
+            PosixFileAttributes attrPoxix = Files.readAttributes(path, PosixFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
+             writeString(attrPoxix.owner().getName(), out);
+             writeString(attrPoxix.group().getName(), out);
+              writeString(PosixFilePermissions.toString(attrPoxix.permissions()), out);
+        }
 
         if (attr.isDirectory()) {
             System.out.println("pack dir: " + path);
@@ -96,7 +103,9 @@ public class Packer {
             // 写入文件名和 inode
             for (File f : filesToPack) {
                 writeString(f.getName(), out);
-               // writeString(getFileKey(f.toPath()), out);
+                if(SystemDiff.isLinux()) {
+                     writeString(getFileKey(f.toPath()), out);
+                }
             }
 
             // 写入一个 int 类型的 0，标识目录打包结束
@@ -125,24 +134,36 @@ public class Packer {
 
 
     void unpack(DataInputStream in, Path path, String fileKey, Map<String, Path> fileKeyToPath) throws IOException {
-        if (fileKey != null) {
-            if (fileKeyToPath.containsKey(fileKey)) {
-                // 当前文件对应的原文件与某个已经解包的文件的原文件指向同一 inode
-                // 建立当前文件到该文件的硬链接
-                Files.createLink(path, fileKeyToPath.get(fileKey));
-                System.out.println("hard link " + path + " to " + fileKeyToPath.get(fileKey) + ", file key: " + fileKey);
-                return;
-            } else {
-                fileKeyToPath.put(fileKey, path);
+        if(SystemDiff.isLinux()) {
+            if (fileKey != null) {
+                if (fileKeyToPath.containsKey(fileKey)) {
+                    // 当前文件对应的原文件与某个已经解包的文件的原文件指向同一 inode
+                    // 建立当前文件到该文件的硬链接
+                    Files.createLink(path, fileKeyToPath.get(fileKey));
+                    System.out.println("hard link " + path + " to " + fileKeyToPath.get(fileKey) + ", file key: " + fileKey);
+                    return;
+                } else {
+                    fileKeyToPath.put(fileKey, path);
+                }
             }
         }
 
         FileTime creationTime = FileTime.from(in.readLong(), TimeUnit.NANOSECONDS);
         FileTime lastAccessTime = FileTime.from(in.readLong(), TimeUnit.NANOSECONDS);
         FileTime lastModifiedTime = FileTime.from(in.readLong(), TimeUnit.NANOSECONDS);
-       // String ownerName = readString(in);
-       // String groupName = readString(in);
-       // String permissionsString = readString(in);
+        String ownerName = "";
+        String groupName = "";
+        String permissionsString = "";
+        if(SystemDiff.isLinux()){
+             ownerName = readString(in);
+             groupName = readString(in);
+             permissionsString = readString(in);
+            System.out.println("ownername="+ownerName);
+            System.out.println("groupname="+groupName);
+            System.out.println("permission="+permissionsString);
+
+        }
+
 
         byte type = in.readByte();
         if (type == DIR) {
@@ -155,7 +176,7 @@ public class Packer {
             while (fileName.length() > 0) {
                 String[] fileNameAndKey = new String[2];
                 fileNameAndKey[0] = fileName;
-               // fileNameAndKey[1] = readString(in);
+                if(SystemDiff.isLinux()) fileNameAndKey[1] = readString(in);
                 fileNameAndKeys.add(fileNameAndKey);
                 fileName = readString(in);
             }
@@ -189,24 +210,26 @@ public class Packer {
         // 如果一开始就设置文件属性的话，以 last modified time 为例
         // 解包文件内容时，由于修改了文件内容，last modified time 会自动更新
         // 就与原来的文件不一致了
-        PosixFileAttributeView attr = Files.getFileAttributeView(path, PosixFileAttributeView.class, LinkOption.NOFOLLOW_LINKS);
-        //try {
-            UserPrincipalLookupService userPrincipalLookupService = path.getFileSystem().getUserPrincipalLookupService();
-            //attr.setOwner(userPrincipalLookupService.lookupPrincipalByName(ownerName));
-            //attr.setGroup(userPrincipalLookupService.lookupPrincipalByGroupName(groupName));
-//        } catch (IOException exception) {
-//            throw new IOException("修改文件所属用户或组失败，请尝试使用管理员身份运行(sudo)", exception.getCause());
-//        }
+        if(SystemDiff.isLinux()) {
+            PosixFileAttributeView attr = Files.getFileAttributeView(path, PosixFileAttributeView.class, LinkOption.NOFOLLOW_LINKS);
+            try {
+                UserPrincipalLookupService userPrincipalLookupService = path.getFileSystem().getUserPrincipalLookupService();
+                attr.setOwner(userPrincipalLookupService.lookupPrincipalByName(ownerName));
+                attr.setGroup(userPrincipalLookupService.lookupPrincipalByGroupName(groupName));
+            } catch (IOException exception) {
+                throw new IOException("修改文件所属用户或组失败，请尝试使用管理员身份运行(sudo)", exception.getCause());
+            }
 
-        if (type != SYMLINK) {
-            // 排除软连接
-            // 如果是软连接的话，设置 permissions 发现会报错
-            // https://askubuntu.com/questions/1151269/is-it-possible-to-change-the-permissions-for-the-symbolic-link
-            // https://www.gnu.org/software/coreutils/manual/html_node/chmod-invocation.html:
-            // chmod never changes the permissions of symbolic links;
-            // the chmod system call cannot change their permissions.
-            // This is not a problem since the permissions of symbolic links are never used.
-           // attr.setPermissions(PosixFilePermissions.fromString(permissionsString));
+            if (type != SYMLINK) {
+                // 排除软连接
+                // 如果是软连接的话，设置 permissions 发现会报错
+                // https://askubuntu.com/questions/1151269/is-it-possible-to-change-the-permissions-for-the-symbolic-link
+                // https://www.gnu.org/software/coreutils/manual/html_node/chmod-invocation.html:
+                // chmod never changes the permissions of symbolic links;
+                // the chmod system call cannot change their permissions.
+                // This is not a problem since the permissions of symbolic links are never used.
+                 attr.setPermissions(PosixFilePermissions.fromString(permissionsString));
+            }
         }
 
         // 最后设置修改时间和访问时间

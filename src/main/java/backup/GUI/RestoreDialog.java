@@ -1,26 +1,24 @@
 package backup.GUI;
 
 import backup.BackupApp;
-import backup.Backuper;
 import backup.Tools.FileHelper;
 import backup.Tools.SavedFile;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
 
 import static backup.BackupApp.fileSavedlist;
 
-public class DemoDialog extends JDialog implements ActionListener{
-    String ok="跳过密码开始备份";
+public class RestoreDialog extends JDialog implements ActionListener{
+    String ok="跳过密码开始恢复";
     String cancel="取消";
     String src;
     String trg;
-    private  JPasswordField backupPassword;
+    private  JPasswordField restorePassword;
     //construct method 构造方法初始化弹窗样式
-    public DemoDialog(String src, String tag){
+    public RestoreDialog(String src, String tag){
         this.src=src;
         trg=tag;
         this.setTitle("输入密码");
@@ -30,7 +28,7 @@ public class DemoDialog extends JDialog implements ActionListener{
         //add one label
         //Container contentPane = this.getContentPane();
 
-        backupPassword = new JPasswordField(16);
+        restorePassword = new JPasswordField(16);
 
 
         //center 居中
@@ -40,12 +38,12 @@ public class DemoDialog extends JDialog implements ActionListener{
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-               startBackup();
+               startRestore();
             }
         });
 
 
-        backupPassword.setBounds(10,10,200,31);
+        restorePassword.setBounds(10,10,200,31);
         JButton okBut = new JButton(ok);
         JButton cancelBut = new JButton(cancel);
     //okBut.setBackground(Color.LIGHT_GRAY);
@@ -60,7 +58,7 @@ public class DemoDialog extends JDialog implements ActionListener{
         // 向对话框中加入各组件
         //  add(jlImg);
         add(button);
-        add(backupPassword);
+        add(restorePassword);
         add(okBut);
         add(cancelBut);
         // 对话框流式布局
@@ -94,7 +92,7 @@ public class DemoDialog extends JDialog implements ActionListener{
         if (ok.equals(e.getActionCommand())) {
             // 对话框不可见
             this.setVisible(false);
-           startBackup();
+           startRestore();
             this.dispose();
             // System.exit(0);
         }
@@ -104,16 +102,16 @@ public class DemoDialog extends JDialog implements ActionListener{
             System.out.println("我啥也没干...");
         }
     }
-    void startBackup(){
-        System.out.println(backupPassword.getPassword());
+    void startRestore(){
+        System.out.println(restorePassword.getPassword());
         try {
-            String password = new String(backupPassword.getPassword()).trim();
-            BackupApp.backuper.backup(src,trg,password);
+            String password = new String(restorePassword.getPassword()).trim();
+            BackupApp.backuper.restore(src,trg,password);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
         System.out.println("我退出程序了...");
-        fileSavedlist.add(new SavedFile(src,trg));
+      //  fileSavedlist.add(new SavedFile(src,trg));
         System.out.println(fileSavedlist);
         try {
             FileHelper.saved();
@@ -121,7 +119,6 @@ public class DemoDialog extends JDialog implements ActionListener{
             throw new RuntimeException(ex);
         }
         BackupPanelGUI.updateBackupTree();
-        RestorePanelGUI.updateRestoreTree();
 
     }
 }
