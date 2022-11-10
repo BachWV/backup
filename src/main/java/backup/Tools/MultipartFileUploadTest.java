@@ -20,15 +20,16 @@ package backup.Tools;
  */
 public class MultipartFileUploadTest {
 
-    public static void main(String[] args) {
-        // 请求地址
+
+    public static void send(String filepath){
         String url = "http://pan.junling.xyz/api/public/upload";
 
         // 请求参数
         Map<String, Object> paramsMap = new HashMap<String, Object>();
-        paramsMap.put("files", new File("D:\\test.txt"));
+        paramsMap.put("files", new File(filepath));
         paramsMap.put("path", "/aliyun/pantest");
         httpMethod(url, paramsMap);
+
     }
 
     public static void httpMethod(String url, Map<String, Object> paramsMap) {

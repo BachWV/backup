@@ -38,7 +38,7 @@ public class OkHttpUtils {
         post(url,requestBody,new OkHttpCallback(){
             @Override
             public String onFinish(String status, String msg) throws JSONException {
-                PanGUI.updateTree();
+
                 return super.onFinish(status, msg);
             }
         });

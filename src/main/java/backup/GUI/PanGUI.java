@@ -1,6 +1,7 @@
 package backup.GUI;
 
 import backup.BackupApp;
+import backup.Tools.CloudFile;
 import backup.Tools.FileHelper;
 import backup.Tools.OkHttpUtils;
 
@@ -16,59 +17,64 @@ import static backup.BackupApp.panPanel;
 import static backup.BackupApp.panTree;
 
 public class PanGUI {
-    public static void updateTree(){
-        panPanel.remove(panTree);
-        GridBagConstraints c = new GridBagConstraints();
-        c.gridx=0;
-        c.gridy=1;
-        c.gridwidth=3;
-        DefaultMutableTreeNode root=new DefaultMutableTreeNode("网盘文件");
-        DefaultMutableTreeNode node=null;
-        for(int i = 0; i< FileHelper.panList.size(); i++)
-        {
-            System.out.println(FileHelper.panList.get(i).filename);
 
-
-            node=new DefaultMutableTreeNode(FileHelper.panList.get(i).filename);
-
-            root.add(node);
-        }
-        c.gridx=0;
-        c.gridy=2;
-        c.gridwidth=3;
-        panTree=new JTree(root);
-        panTree.addTreeSelectionListener(new TreeSelectionListener() {
-            @Override
-            public void valueChanged(TreeSelectionEvent e) {
-                DefaultMutableTreeNode node = (DefaultMutableTreeNode) panTree.getLastSelectedPathComponent();
-                String name=node.getUserObject().toString();
-                System.out.println(name);
-                 new DialogDownload(name);
-
-            }
-        });
-        panPanel.add(panTree,c);
-
-
-    }
    public static void init(){
 
-        panPanel.setLayout(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
-        c.gridx=0;
-        c.gridy=0;
-        c.gridwidth=1;
+        panPanel.setLayout(null);
+
         JButton panDownload=new JButton("下载云端目录");
         panDownload.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 OkHttpUtils.main();
+                try {
+                    Thread.sleep(2000);    //延时2秒
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
+                EventQueue.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        panPanel.remove(panTree);
+
+                        DefaultMutableTreeNode root=new DefaultMutableTreeNode("网盘文件");
+                        DefaultMutableTreeNode node=null;
+
+                        for(int i = 0; i< FileHelper.panList.size(); i++)
+                        {
+                            CloudFile c=FileHelper.panList.get(i);
+                            System.out.println(c.filename);
+                            node=new DefaultMutableTreeNode(c.filename);
+                            root.add(node);
+                        }
+                        System.out.println("构建完成");
+                        panTree=new JTree(root);
+                        panTree.addTreeSelectionListener(new TreeSelectionListener() {
+                            @Override
+                            public void valueChanged(TreeSelectionEvent e) {
+                                DefaultMutableTreeNode node = (DefaultMutableTreeNode) panTree.getLastSelectedPathComponent();
+                                String name= node.getUserObject().toString();
+                                System.out.println("点击"+name);
+                                new DialogDownload(name);
+
+
+                            }
+                        });
+                        panTree.setBounds(10,50,200,1000);
+                        panPanel.add(panTree);
+                        panPanel.updateUI();
+                        panPanel.repaint();
+                    }
+                });
 
 
             }
         });
-        panPanel.add(panDownload,c);
-        c.gridy=1;
+        panDownload.setBounds(10,10,200,40);
+
+        panPanel.add(panDownload);
+
 
 // ---------------
 
@@ -77,15 +83,9 @@ public class PanGUI {
         for(int i = 0; i< FileHelper.panList.size(); i++)
         {
             System.out.println(FileHelper.panList.get(i).filename);
-
-
             node=new DefaultMutableTreeNode(FileHelper.panList.get(i).filename);
-
             root.add(node);
         }
-        c.gridx=0;
-        c.gridy=2;
-        c.gridwidth=3;
         panTree=new JTree(root);
        panTree.addTreeSelectionListener(new TreeSelectionListener() {
            @Override
@@ -99,7 +99,8 @@ public class PanGUI {
                ///   JOptionPane.showMessageDialog("点中了"+node.toString(), "OK", JOptionPane.INFORMATION_MESSAGE);
            }
        });
-        panPanel.add(panTree,c);
+       panTree.setBounds(10,50,200,1000);
+        panPanel.add(panTree);
 
     }
 }

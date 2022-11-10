@@ -61,12 +61,13 @@ public class OkHttpCallback implements Callback {
         System.out.println(data);
 
        JSONArray files= (JSONArray) data.get("files");
+        FileHelper.panList.clear();
        for(int i=0;i<files.size();i++){
            JSONObject ooo=files.getJSONObject(i);
            System.out.println(ooo);
-          String filename=ooo.getString("name");
+           String filename=ooo.getString("name");
 
-          String trueUrl=ooo.getString("url");
+           String trueUrl=ooo.getString("url");
            System.out.println(trueUrl);
            FileHelper.panList.add(new CloudFile(filename,trueUrl));
 
