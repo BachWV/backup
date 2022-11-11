@@ -2,20 +2,12 @@ package backup;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
 
 import backup.GUI.*;
 import backup.Tools.*;
-import com.formdev.flatlaf.FlatDarculaLaf;
-import com.formdev.flatlaf.FlatDarkLaf;
-import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Dictionary;
 import javax.swing.JTree;
 
 /**
@@ -53,7 +45,7 @@ public class BackupApp extends JFrame {
     private void initSetting() {
         try{
             FileHelper.read();
-            WatchServiceDemo.main();
+            WatchService.registerAllFileDir();
 
         }catch (Exception e){
             e.printStackTrace();

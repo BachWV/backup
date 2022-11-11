@@ -7,8 +7,8 @@ import java.nio.file.*;
 
 import static backup.BackupApp.fileSavedlist;
 
-public class WatchServiceDemo {
-   public static void  main(){
+public class WatchService {
+   public static void registerAllFileDir(){
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -16,9 +16,7 @@ public class WatchServiceDemo {
                 try {
                     for(SavedFile ss:fileSavedlist){
                         System.out.println(ss.src);
-
-                     create(ss);
-
+                        create(ss);
                     }
 
                 } catch (IOException e) {
@@ -31,10 +29,8 @@ public class WatchServiceDemo {
     public static void create(SavedFile ss) throws IOException {
 
         // 这里的监听必须是目录
-
-
         // 创建WatchService，它是对操作系统的文件监视器的封装，相对之前，不需要遍历文件目录，效率要高很多
-        WatchService watcher = FileSystems.getDefault().newWatchService();
+        java.nio.file.WatchService watcher = FileSystems.getDefault().newWatchService();
         // 注册指定目录使用的监听器，监视目录下文件的变化；
         // PS：Path必须是目录，不能是文件；
         // StandardWatchEventKinds.ENTRY_MODIFY，表示监视文件的修改事件
@@ -74,8 +70,6 @@ public class WatchServiceDemo {
                     System.out.println("文件更新: " + fileName);
                     System.out.println("重新备份");
                     BackupApp.backuper.backup(ss.src,ss.trg,"");
-
-
 
                 }
                 // 每次调用WatchService的take()或poll()方法时需要通过本方法重置

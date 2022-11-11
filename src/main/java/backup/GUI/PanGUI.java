@@ -1,6 +1,5 @@
 package backup.GUI;
 
-import backup.BackupApp;
 import backup.Tools.CloudFile;
 import backup.Tools.FileHelper;
 import backup.Tools.OkHttpUtils;
@@ -26,7 +25,7 @@ public class PanGUI {
         panDownload.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OkHttpUtils.main();
+                OkHttpUtils.getCloudFileList();
                 try {
                     Thread.sleep(2000);    //延时2秒
                 } catch (InterruptedException ex) {
@@ -94,9 +93,6 @@ public class PanGUI {
                if (node == null) {
                    return;
                }
-               // Container contentPane = getContentPane();
-
-               ///   JOptionPane.showMessageDialog("点中了"+node.toString(), "OK", JOptionPane.INFORMATION_MESSAGE);
            }
        });
        panTree.setBounds(10,50,200,1000);

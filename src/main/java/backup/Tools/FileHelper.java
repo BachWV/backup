@@ -11,10 +11,6 @@ import java.util.List;
 
 
 public class FileHelper {
-    public static void main(String[] args) throws FileNotFoundException {
-        saved();
-        read();
-    }
     public static ArrayList<CloudFile> panList=new ArrayList<>();
     public static void saved() throws FileNotFoundException {
 
@@ -23,8 +19,6 @@ public class FileHelper {
 
         String ss=JSONArray.toJSONString(BackupApp.fileSavedlist);
         System.out.println(ss);
-
-
         try{
             writer= new BufferedWriter(new OutputStreamWriter(out));
             writer.write(ss);
@@ -39,7 +33,6 @@ public class FileHelper {
         StringBuilder sb=new StringBuilder();
         BufferedReader reader=new BufferedReader(new InputStreamReader(in));
         try{
-
             reader=new BufferedReader(new InputStreamReader(in));
             String line="";
             while((line=reader.readLine())!=null){
