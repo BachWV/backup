@@ -10,12 +10,11 @@ import java.awt.event.ActionListener;
 import java.io.File;
 
 
-import backup.Tools.MultipartFileUploadTest;
+import backup.Tools.OkHttpUtils;
 import backup.Tools.SavedFile;
 
-import static backup.BackupApp.fileSavedlist;
-import static backup.BackupApp.tabbedPane;
-import static backup.GUI.RestorePanelGUI.restorePanel;
+import static backup.GUIApp.fileSavedlist;
+import static backup.GUIApp.tabbedPane;
 
 public class BackupPanelGUI {
     private static JTree backupTree;
@@ -69,7 +68,7 @@ public class BackupPanelGUI {
                         @Override
                         public void run() {
 
-                            MultipartFileUploadTest.send(filepath);
+                            OkHttpUtils.MultipartFileUploadPost(filepath);
                         }
                     }).start();
 

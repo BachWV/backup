@@ -37,9 +37,9 @@ mvn compile
 
 ```shell
 # Linux 下
-mvn exec:java -Dexec.mainClass=backup.BackupApp
+mvn exec:java -Dexec.mainClass=backup.GUIApp
 
 # Windows 下
-mvn exec:java "-Dexec.mainClass=backup.BackupApp"
+mvn exec:java "-Dexec.mainClass=backup.GUIApp"
 ```
 

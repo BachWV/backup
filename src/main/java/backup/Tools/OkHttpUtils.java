@@ -3,8 +3,18 @@ package backup.Tools;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+
 import okhttp3.Call;
 import okhttp3.Response;
 import okhttp3.OkHttpClient;
@@ -77,6 +87,77 @@ public class OkHttpUtils {
 //        RequestBody body = RequestBody.create(JSON,json);
         Request request = new Request.Builder().url(url).post(body).build();
         CLIENT.newCall(request).enqueue(callback);
+    }
+    /**
+     * multipart/form-data表单多文件+多参数
+     * @author ljl
+     */
+    public static void MultipartFileUploadPost(String filepath){
+        String url = "http://pan.junling.xyz/api/public/upload";
+
+        // 请求参数
+        Map<String, Object> paramsMap = new HashMap<String, Object>();
+        paramsMap.put("files", new File(filepath));
+        paramsMap.put("path", "/aliyun/pantest");
+        httpMethod(url, paramsMap);
+
+    }
+
+    public static void httpMethod(String url, Map<String, Object> paramsMap) {
+        // 创建client对象 创建调用的工厂类 具备了访问http的能力
+        OkHttpClient client = new OkHttpClient()
+                .newBuilder()
+                .connectTimeout(60, TimeUnit.SECONDS) // 设置超时时间
+                .readTimeout(60, TimeUnit.SECONDS) // 设置读取超时时间
+                .writeTimeout(60, TimeUnit.SECONDS) // 设置写入超时时间
+                .build();
+
+        // 添加请求类型
+        MultipartBody.Builder builder = new MultipartBody.Builder();
+        builder.setType(MediaType.parse("multipart/form-data"));
+
+        //  创建请求的请求体
+        for (String key : paramsMap.keySet()) {
+            // 追加表单信息
+            Object object = paramsMap.get(key);
+            if (object instanceof File) {
+                File file = (File) object;
+                builder.addFormDataPart(key, file.getName(), RequestBody.create(file, null));
+            } else {
+                builder.addFormDataPart(key, object.toString());
+            }
+        }
+        RequestBody body = builder.build();
+
+        // 创建request, 表单提交
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+
+        // 创建一个通信请求
+        try (Response response = client.newCall(request).execute()) {
+            // 尝试将返回值转换成字符串并返回
+            System.out.println("==>返回结果: " + response.body().string());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void downloadFile(String url, String tagretDir, String filename) {
+        OkHttpUtils.get(url,new OkHttpCallback(){
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+
+                byte []bytes=response.body().bytes();
+                Path filePath = Paths.get(tagretDir+"\\" +filename);
+
+                //不存在文件 => 创建
+                Files.write(filePath, bytes, StandardOpenOption.CREATE);
+
+            }
+        });
+
     }
 
 

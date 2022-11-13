@@ -12,8 +12,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import static backup.BackupApp.panPanel;
-import static backup.BackupApp.panTree;
+import static backup.GUIApp.panPanel;
+import static backup.GUIApp.panTree;
 
 public class PanGUI {
 

@@ -1,29 +1,26 @@
 package backup.Tools;
 
-import backup.BackupApp;
+import backup.GUIApp;
 
 import java.io.IOException;
 import java.nio.file.*;
 
-import static backup.BackupApp.fileSavedlist;
+import static backup.GUIApp.fileSavedlist;
 
 public class WatchService {
    public static void registerAllFileDir(){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
+        new Thread(() -> {
 
-                try {
-                    for(SavedFile ss:fileSavedlist){
-                        System.out.println(ss.src);
-                        create(ss);
-                    }
-
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+            try {
+                for(SavedFile ss:fileSavedlist){
+                    System.out.println(ss.src);
+                    create(ss);
                 }
 
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
+
         }).start();
     }
     public static void create(SavedFile ss) throws IOException {
@@ -69,7 +66,7 @@ public class WatchService {
                     Path fileName = watchable.getFileName();
                     System.out.println("文件更新: " + fileName);
                     System.out.println("重新备份");
-                    BackupApp.backuper.backup(ss.src,ss.trg,"");
+                    GUIApp.backuper.backup(ss.src,ss.trg,"");
 
                 }
                 // 每次调用WatchService的take()或poll()方法时需要通过本方法重置

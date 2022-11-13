@@ -1,13 +1,11 @@
 package backup.Tools;
 
-import backup.BackupApp;
+import backup.GUIApp;
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class FileHelper {
@@ -17,7 +15,7 @@ public class FileHelper {
         FileOutputStream out=new FileOutputStream(new File("./setting.ini"));
         BufferedWriter writer=null;
 
-        String ss=JSONArray.toJSONString(BackupApp.fileSavedlist);
+        String ss=JSONArray.toJSONString(GUIApp.fileSavedlist);
         System.out.println(ss);
         try{
             writer= new BufferedWriter(new OutputStreamWriter(out));
@@ -49,12 +47,12 @@ public class FileHelper {
         JSONArray bbb = JSONArray.parseArray(sb.toString());
         System.out.println("--------------------");
         System.out.println(bbb);
-        BackupApp.fileSavedlist.clear();
-        for(int i=0;i<bbb.size();i++){
-            JSONObject JB=  (JSONObject) bbb.get(i);
-            String SRC=JB.getString("src");
-            String TRG=JB.getString("trg");
-            BackupApp.fileSavedlist.add(new SavedFile(SRC,TRG));
+        GUIApp.fileSavedlist.clear();
+        for (Object o : bbb) {
+            JSONObject JB = (JSONObject) o;
+            String SRC = JB.getString("src");
+            String TRG = JB.getString("trg");
+            GUIApp.fileSavedlist.add(new SavedFile(SRC, TRG));
 
         }
         System.out.println(ff);

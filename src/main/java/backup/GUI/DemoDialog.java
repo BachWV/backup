@@ -1,17 +1,15 @@
 package backup.GUI;
 
-import backup.BackupApp;
-import backup.Backuper;
+import backup.GUIApp;
 import backup.Tools.FileHelper;
 import backup.Tools.SavedFile;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
 
-import static backup.BackupApp.fileSavedlist;
+import static backup.GUIApp.fileSavedlist;
 
 public class DemoDialog extends JDialog implements ActionListener{
     String ok="跳过密码开始备份";
@@ -108,7 +106,7 @@ public class DemoDialog extends JDialog implements ActionListener{
         System.out.println(backupPassword.getPassword());
         try {
             String password = new String(backupPassword.getPassword()).trim();
-            BackupApp.backuper.backup(src,trg,password);
+            GUIApp.backuper.backup(src,trg,password);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }

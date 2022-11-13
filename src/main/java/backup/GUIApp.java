@@ -3,7 +3,9 @@ package backup;
 import javax.swing.*;
 import java.awt.*;
 
-import backup.GUI.*;
+import backup.GUI.BackupPanelGUI;
+import backup.GUI.PanGUI;
+import backup.GUI.RestorePanelGUI;
 import backup.Tools.*;
 import com.formdev.flatlaf.FlatLightLaf;
 
@@ -13,15 +15,14 @@ import javax.swing.JTree;
 /**
  * 备份应用 GUI 入口
  */
-public class BackupApp extends JFrame {
+public class GUIApp extends JFrame {
     public  static JPanel panPanel;
     public static JTabbedPane tabbedPane;
     JFileChooser fc = new JFileChooser();
 
     public static Backuper backuper = new Backuper();
-    private final DiffChecker diffChecker = new DiffChecker();
     public static ArrayList<SavedFile> fileSavedlist =new ArrayList<>();
-    public BackupApp(){
+    public GUIApp(){
         super("备份之王");
 
         //Flat Light
@@ -70,17 +71,10 @@ public class BackupApp extends JFrame {
         tabbedPane.setTabPlacement(2);
         RestorePanelGUI.restorePanel = new JPanel();
         BackupPanelGUI.init();
-
         RestorePanelGUI.init();
-
-        //============================= restore ============================
-
-//-------------------
         panPanel=new JPanel();
         PanGUI.init();
-
         tabbedPane.add("网盘", panPanel);
-        //----------------------
 
         add(tabbedPane);
         //add(backupPanel);
@@ -89,22 +83,11 @@ public class BackupApp extends JFrame {
 
     }
 
-    private JLabel fixedSizeLabel(String text) {
-        JLabel label = new JLabel(text);
-        Dimension dimension = new Dimension(320, 32);
-        label.setMinimumSize(dimension);
-        label.setMaximumSize(dimension);
-        label.setPreferredSize(dimension);
-        return label;
-    }
-
-
-
     public static void main(String[] args) throws UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         String lookAndFeel = UIManager.getSystemLookAndFeelClassName();
         UIManager.setLookAndFeel(lookAndFeel);
         SwingUtilities.invokeLater(() -> {
-            BackupApp app = new BackupApp();
+            GUIApp app = new GUIApp();
             app.setVisible(true);
         });
     }

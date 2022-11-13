@@ -1,21 +1,17 @@
 package backup.GUI;
 
-import backup.BackupApp;
-import backup.Packer;
 import backup.Tools.CloudFile;
-import backup.Tools.DownloadFile;
 import backup.Tools.FileHelper;
-import backup.Tools.SavedFile;
+import backup.Tools.OkHttpUtils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileNotFoundException;
 
 
-import static backup.BackupApp.fileSavedlist;
+import static backup.GUIApp.fileSavedlist;
 
 public class DialogDownload extends JDialog implements ActionListener{
     String ok="下载";
@@ -136,7 +132,7 @@ public class DialogDownload extends JDialog implements ActionListener{
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        DownloadFile.main(trueUrl,path,filename);
+                        OkHttpUtils.downloadFile(trueUrl,path,filename);
                     }
                 }).start();
 

@@ -1,15 +1,14 @@
 package backup.GUI;
 
-import backup.BackupApp;
+import backup.GUIApp;
 import backup.Tools.FileHelper;
-import backup.Tools.SavedFile;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
 
-import static backup.BackupApp.fileSavedlist;
+import static backup.GUIApp.fileSavedlist;
 
 public class RestoreDialog extends JDialog implements ActionListener{
     String ok="跳过密码开始恢复";
@@ -39,6 +38,7 @@ public class RestoreDialog extends JDialog implements ActionListener{
             @Override
             public void actionPerformed(ActionEvent e) {
                startRestore();
+
             }
         });
 
@@ -106,9 +106,12 @@ public class RestoreDialog extends JDialog implements ActionListener{
         System.out.println(restorePassword.getPassword());
         try {
             String password = new String(restorePassword.getPassword()).trim();
-            BackupApp.backuper.restore(src,trg,password);
+            GUIApp.backuper.restore(src,trg,password);
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            if(ex.getMessage().equals("密码错误"));
+            JOptionPane.showMessageDialog(null, "密码错误", "Error", JOptionPane.ERROR_MESSAGE);
+            System.out.println(ex.getMessage());
+
         }
         System.out.println("我退出程序了...");
       //  fileSavedlist.add(new SavedFile(src,trg));
@@ -119,6 +122,6 @@ public class RestoreDialog extends JDialog implements ActionListener{
             throw new RuntimeException(ex);
         }
         BackupPanelGUI.updateBackupTree();
-
+        this.dispose();
     }
 }

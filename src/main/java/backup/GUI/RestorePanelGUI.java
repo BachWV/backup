@@ -1,7 +1,6 @@
 package backup.GUI;
 
 import backup.Tools.SavedFile;
-import com.sun.source.tree.NewArrayTree;
 
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
@@ -12,7 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
-import static backup.BackupApp.*;
+import static backup.GUIApp.*;
 import static backup.GUI.BackupPanelGUI.fixedSizeLabel;
 
 
