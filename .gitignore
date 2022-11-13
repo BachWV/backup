@@ -2,4 +2,6 @@
 *.iml
 target
 out
+setting.ini
+README.pdf
 
