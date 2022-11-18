@@ -3,6 +3,7 @@ package backup.GUI;
 import backup.GUIApp;
 import backup.Tools.FileHelper;
 import backup.Tools.SavedFile;
+import backup.Tools.WatchService;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -35,12 +36,7 @@ public class DemoDialog extends JDialog implements ActionListener{
 
         JButton button = new JButton("确定");
         button.setBounds(170,10,100,31);
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-               startBackup();
-            }
-        });
+        button.addActionListener(e -> startBackup());
 
 
         backupPassword.setBounds(10,10,200,31);
@@ -110,9 +106,12 @@ public class DemoDialog extends JDialog implements ActionListener{
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
-        System.out.println("我退出程序了...");
+        System.out.println("备份成功，退出");
         fileSavedlist.add(new SavedFile(src,trg));
         System.out.println(fileSavedlist);
+        WatchService.registerAllFileDir();
+        System.out.println("添加新监听"+src);
+
         try {
             FileHelper.saved();
         } catch (FileNotFoundException ex) {

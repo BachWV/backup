@@ -96,7 +96,7 @@ public class PanGUI {
            }
        });
        panTree.setBounds(10,50,200,1000);
-        panPanel.add(panTree);
+       panPanel.add(panTree);
 
     }
 }

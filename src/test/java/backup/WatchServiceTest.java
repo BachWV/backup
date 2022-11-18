@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class WatchServiceTest {
     @Test
-    void createTest() {
+    public void createTest() {
         if (SystemDiff.isWindows()) {
             SavedFile sf = new SavedFile("D://test", "~/Desktop/test");
             try {

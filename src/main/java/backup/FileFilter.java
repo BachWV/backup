@@ -43,6 +43,8 @@ public class FileFilter {
                 } else {
                     specificPaths.add(root.resolve(line).normalize());
                 }
+                System.out.println(suffixSet);
+                System.out.println(specificPaths);
 
             }
         } catch (Exception e) {

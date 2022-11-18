@@ -34,7 +34,7 @@ public class WatchService {
 
 
         Path path2 = Paths.get(ss.src);
-        path2.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY);
+        path2.register(watcher, StandardWatchEventKinds.ENTRY_CREATE);
 
 
         // 创建一个线程，等待目录下的文件发生变化

@@ -25,7 +25,7 @@ public class BackupPanelGUI {
     private static JButton backupStartButton;
     public static JPanel backupPanel ;
     private static final String BACKUP_SOURCE_PLACEHOLDER = "选择源备份目录";
-    private static final String BACKUP_TARGET_PLACEHOLDER = "选择目标存放目录";
+    private static final String BACKUP_TARGET_PLACEHOLDER = "选择备份文件存放目录";
 
     public static String sourcePath="";
     public static String targetPath="";
@@ -106,7 +106,7 @@ public class BackupPanelGUI {
         c.gridwidth = 3;
         backupPanel.add(backupSourceLabel, c);
      //   backupSourceLabel.setFont(new Font("微软雅黑", Font.BOLD, 23));
-        backupSourceButton = new JButton("Choose source dir");
+        backupSourceButton = new JButton("选择源目录");
         backupSourceButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -124,6 +124,7 @@ public class BackupPanelGUI {
                 String path = file.getAbsolutePath();
                 sourcePath=new String(path);
 
+                backupSourceLabel.setText("选择源备份目录"+sourcePath);
             }
         });
         c.gridx = 3;
@@ -137,7 +138,7 @@ public class BackupPanelGUI {
         c.gridwidth = 3;
         backupPanel.add(backTargetLabel, c);
 
-        backupTargetButton = new JButton("Choose target dir");
+        backupTargetButton = new JButton("选择目标目录");
         backupTargetButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -154,6 +155,7 @@ public class BackupPanelGUI {
                 File file = fc.getSelectedFile();
                 String path = file.getAbsolutePath();
                 targetPath=new String(path);
+                backTargetLabel.setText("选择备份文件存放目录"+targetPath);
 
             }
         });
@@ -167,11 +169,11 @@ public class BackupPanelGUI {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if ("".equals(sourcePath)) {
-                    error("You need to select the directory to backup first");
+                    error("请先选择需要备份的目录");
                     return;
                 }
                 if ("".equals(targetPath)) {
-                    error("You need to select the directory to place the backup file first");
+                    error("请先选择备份文件存放目录");
                     return;
                 }
 

@@ -1,15 +1,9 @@
 package backup;
 
-import org.junit.Test;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
-
-import static backup.Tools.FileHelper.read;
-import static backup.Tools.FileHelper.saved;
-import static backup.Tools.OkHttpUtils.getCloudFileList;
 
 public class TestUtils {
 
@@ -25,24 +19,8 @@ public class TestUtils {
                 return false;
             }
         }
-
         return true;
     }
-    @Test
-    public static void main(String[] args) {
-        getCloudFileList();
 
-    }
-
-    @Test
-    public void httpget(){
-
-        getCloudFileList();
-    }
-    @Test
-    public void fileHelp() throws FileNotFoundException {
-        saved();
-        read();
-    }
 
 }

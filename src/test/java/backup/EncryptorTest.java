@@ -10,7 +10,7 @@ public class EncryptorTest {
     @Test
     public void testEncrypt() throws Exception {
        // File original = new File(getClass().getResource("/encrypt/linux_makefile.txt").toURI());
-        File original = new File(getClass().getResource("/encrypt/abc.txt").toURI());
+        File original = new File(getClass().getResource("/encrypt/linux_makefile.txt").toURI());
         System.out.println(original);
         File encrypted = File.createTempFile("encrypted-", ".enc");
         File decrypted = File.createTempFile("decrypted-", ".txt");
