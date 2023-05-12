@@ -16,7 +16,7 @@
 
 还原过程就是上面过程反过来。
 
-上传至网盘，当然是公共目录。http://pan.junling.xyz/aliyun/pantest
+上传至网盘，当然是公共目录。http://120.24.176.162:5244/aliyun/pantest
 
 ## 编译运行
 
@@ -34,13 +34,16 @@ java -jar backup_lab.jar
 ```
 ## docker 运行环境
 
-本项目使用的运行环境 已上传至docker hub，建议参考
-https://github.com/BachWV/x11vnc-desktop/
-的zh_CN分支，并使用Github Action打包
+本项目使用的运行环境 已上传至docker hub
+
 ```shell
 docker pull bachwv/docker-desktop:zh_CN
 ```
 
-使用`python init_desktop.py`运行
+构建参考
+https://github.com/BachWV/x11vnc-desktop/
+的zh_CN分支，并使用Github Action打包，直接使用dockerfile打包可能出现问题
+
+使用`python init_desktop.py`运行docker（挂载当前目录至docker中的~/shared目录，在docker中使用`java -jar backup_lab.jar`运行本软件 ）
 
 ![image-20221117163256291](https://s2.loli.net/2022/11/17/FSWDYUKEZHPeqIb.png)

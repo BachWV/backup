@@ -25,12 +25,12 @@ import org.jetbrains.annotations.NotNull;
 
 
 public class OkHttpUtils {
-
+    private static final String domain = new String("120.24.176.162"); 
     private static final OkHttpClient CLIENT = new OkHttpClient.Builder().retryOnConnectionFailure(false).build();
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
     public static void getCloudFileList() {
-        String url="http://pan.junling.xyz/api/public/path";
+        String url="http://"+domain+"/api/public/path";
         String body="{\n" +
                 "    \"path\": \"/aliyun/pantest\"\n" +
                 "}";
@@ -93,7 +93,7 @@ public class OkHttpUtils {
      * @author ljl
      */
     public static void MultipartFileUploadPost(String filepath){
-        String url = "http://pan.junling.xyz/api/public/upload";
+        String url = "http://"+domain+"/api/public/upload";
 
         // 请求参数
         Map<String, Object> paramsMap = new HashMap<String, Object>();
